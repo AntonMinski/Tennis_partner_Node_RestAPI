@@ -2,17 +2,17 @@ const http = require('http');
 const express = require('express');
 const environment = require('dotenv');
 
+// Route files
+const offers_router = require('./routes/offers');
+
 // Load env vard:
 environment.config({path: './config/config.env'});
 
 const app = express();
 
-// const server = http.createServer((req, res) => {
-//     res.setHeader('Content-Type', 'text/html');
-//     res.setHeader('X-Powered-By', 'Node.js');
-//     res.write('<h1>Hello</h1>');
-//     res.end();
-// });
+//mount routers:
+app.use('/api/v1/offers', offers_router)
+
 
 const port = process.env.Port || 5000;
 
