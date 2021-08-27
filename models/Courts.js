@@ -1,4 +1,8 @@
 const mongoose = require('mongoose');
+const slugify = require('slugify');
+const geocoder = require('../utils/geoCoder')
+
+
 const CourtSchema = new mongoose.Schema({
     name: {
         type: String,
@@ -63,5 +67,25 @@ const CourtSchema = new mongoose.Schema({
         default: Date.now
     }
 });
+
+// Create court slug:
+CourtSchema.pre('save', function (next) {
+    this.slug = slugify(this.name, {lower: true});
+    next();
+});
+
+// Geocode & location field creation
+// CourtSchema.pre('save', async function (next) {
+//     const lct = await geocoder.geocode(this.address);
+//     this.location = {
+//         type: 'Point',
+//         coordinates: [lct[0].longitude, lct[0].latitude],
+//         formattedAddress: lct[0].formattedAddress,
+//         street: lct[0].streetName,
+//         streetNuber: lct[0].streetNuber,
+//         city: lct[0].streetName
+//     }
+//     next();
+// })
 
 module.exports = mongoose.model('Courts', CourtSchema);
