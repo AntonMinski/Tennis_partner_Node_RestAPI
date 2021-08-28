@@ -4,16 +4,21 @@ const router = express.Router();
 const {getOffers, getOffer, postOffer, editOffer, deleteOffer}
 = require('../controllers/offers')
 
+// Set authorization permissions:
+const { authenticated } = require('../middleware/auth');
+
+//use:
+
 router
     .route('/')
     .get(getOffers)
-    .post(postOffer);
+    .post(authenticated, postOffer);
 
 router
     .route('/:id')
     .get(getOffer)
-    .put(editOffer)
-    .delete(deleteOffer);
+    .put(authenticated, editOffer)
+    .delete(authenticated, deleteOffer);
 
 
 

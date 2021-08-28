@@ -2,9 +2,11 @@ const http = require('http');
 const express = require('express');
 const environment = require('dotenv');
 const morgan = require('morgan');
-const connectDB = require('./models/db');
 const colors = require('colors');
+const cookieParser = require('cookie-parser');
+
 const errorHandler = require('./middleware/error');
+const connectDB = require('./models/db');
 
 // Load env vars:
 environment.config({path: './config/config.env'});
@@ -22,6 +24,9 @@ const app = express();
 
 //body parser:
 app.use(express.json());
+
+// cookie parser:
+app.use(cookieParser());
 
 // middleware:
 // logging request detail:

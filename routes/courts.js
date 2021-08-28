@@ -5,16 +5,18 @@ const Courts =  require('../models/Courts');
 const {getCourts, getCourt, postCourt, editCourt, deleteCourt}
 = require('../controllers/courts')
 
+const { authenticated, hasPermission } = require('../middleware/auth');
+
 router
     .route('/')
     .get(getCourts)
-    .post(postCourt);
+    .post(authenticated, hasPermission('user', 'admin'), postCourt);
 
 router
     .route('/:id')
     .get(getCourt)
-    .put(editCourt)
-    .delete(deleteCourt);
+    .put(authenticated, editCourt)
+    .delete(authenticated, hasPermission('user', 'admin'), deleteCourt);
 
 
 

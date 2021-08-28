@@ -13,16 +13,9 @@ exports.register = asyncHandler(async(req, res, next) => {
     const user = await User.create({
         username, email, password, role })
 
-    // Create token:
-    const token = user.getSignedJwtToken();
-
-    res.status(200).json({
-            sucess: true,
-            token
-        });
+    // send token and cookie:
+    sendTokenResponse(user, 200, res);
 });
-
-
 
 // desc: login user
 // route: POST /api/v1/auth/login
@@ -47,12 +40,37 @@ exports.login = asyncHandler(async(req, res, next) => {
          return  next(new ErrorResponse('Wrong password', 401));
      }
 
-    // Create token:
+    // send token and cookie:
+    sendTokenResponse(user, 200, res);
+});
+
+exports.getUser = asyncHandler(async(req, res, next) => {
+    const user = await User.findById(req.user.id);
+
+    res.status(200).json({sucess: true, data: user});
+});
+
+
+
+// Get token, send cookie:
+const sendTokenResponse = (user, statusCode, res) => {
+    // create token:
     const token = user.getSignedJwtToken();
 
-    res.status(200).json({
-            sucess: true,
-            token
-        });
-});
+    const options = {
+        expires: new Date(Date.now() + process.env.JWT_COOKIE_EXPIRE * 24
+        * 60 * 60 * 1000),
+        httpOnly: true,
+    };
+
+    if (process.env.NODE_ENV === 'production') {
+        options.secure = true;
+    }
+
+    res
+        .status(statusCode)
+        .cookie('token', token, options)
+        .json({sucess: true, token});
+
+};
 
