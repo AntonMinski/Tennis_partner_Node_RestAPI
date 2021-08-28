@@ -54,7 +54,8 @@ const CourtSchema = new mongoose.Schema({
     cover: {
         type: String,
         required: [true, `Please specify your cover`],
-        maxlenght: [30, `This field can't ne longer than 30 characters`]
+        maxlenght: [30, `This field can't ne longer than 30 characters`],
+        enum: ['grass', 'clay', 'hard']
     },
 
     photo: {

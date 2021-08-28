@@ -15,6 +15,7 @@ connectDB();
 // Route files
 const offers_router = require('./routes/offers');
 const courts_router = require('./routes/courts');
+const auth_router = require('./routes/auth');
 
 
 const app = express();
@@ -29,6 +30,7 @@ app.use(morgan('dev'));
 //mount routers:
 app.use('/api/v1/offers', offers_router);
 app.use('/api/v1/courts', courts_router);
+app.use('/api/v1/auth', auth_router);
 
 app.use(errorHandler);
 
