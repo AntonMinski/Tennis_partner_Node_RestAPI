@@ -118,14 +118,13 @@ exports.resetPassword = asyncHandler(async(req, res, next) => {
     const resetPasswordToken = crypto.createHash('sha256')
         .update(req.params.resettoken).digest('hex');
 
+    // find user
     const user = await User.findOne({
         resetPasswordToken,
         resetPasswordExpire: { $gt: Date.now() }
     });
-
         if (!user) {
-        return next(new ErrorResponse('Invalid token', 400));
-    }
+        return next(new ErrorResponse('Invalid token', 400));}
 
     // Set new pasword:
     user.password = req.body.password;
@@ -134,7 +133,42 @@ exports.resetPassword = asyncHandler(async(req, res, next) => {
     await user.save();
 
     sendTokenResponse(user, 200, res)
+});
+
+// desc: update user details 
+// route: PUT /api/v1/auth/update_user
+// access: Private
+exports.updateUser = asyncHandler(async (req, res, next) => {
+    const fieldsToUpdate = {
+        username: req.body.username,
+        email: req.body.email,
+    }
+
+    const user = await User.findByIdAndUpdate(req.user.id, fieldsToUpdate, {
+        new: true,
+        runValidators:true
+    });
+
+    res.status(200).json({success:true, user})
 
 });
 
+// desc: change user password
+// route: PUT /api/v1/auth/change_password
+// access: Private
+exports.updatePassword = asyncHandler(async (req, res, next) => {
+    const user = await User.findById(req.user.id).select('+password');
+    // (by default password.select = false)
+
+    // check password
+    if (!(await user.matchPassword(req.body.currentPassword))) {
+        return next(new ErrorResponse('current password is incorrect', 401));
+    }
+
+    // change password
+    user.password = req.body.newPassword
+    await user.save();
+
+    sendTokenResponse(user, 200, res);
+});
 
