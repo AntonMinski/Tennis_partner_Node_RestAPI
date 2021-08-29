@@ -33,9 +33,13 @@ exports.getOffer = (req, res, next) => {
 // desc: create offer
 // route: POST /api/v1/offers/
 // access: Private
-exports.postOffer = (req, res, next) => {
-    res.status(200).json({sucess: true});
-};
+exports.postOffer = asyncHandler (async (req, res, next) => {
+    // Add user to body:
+    req.body.user = req.user.id;
+    const offer = await Offer.create(req.body);
+
+    res.status(200).json({sucess: true, offer});
+});
 
 // desc: edit offer
 // route: PUT /api/v1/offers/:id

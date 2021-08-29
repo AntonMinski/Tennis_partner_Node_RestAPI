@@ -66,7 +66,13 @@ const CourtSchema = new mongoose.Schema({
     openingDate: {
         type: Date,
         default: Date.now
-    }
+    },
+
+    user: {
+        type: mongoose.Schema.ObjectId,
+        ref: 'Users',
+        require: true,
+    },
 });
 
 // Create court slug:

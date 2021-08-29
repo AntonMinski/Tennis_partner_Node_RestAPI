@@ -6,8 +6,8 @@ const UserSchema = new mongoose.Schema({
 
     username: {
         type: String,
-        required: true,
-        unique: true,
+        required: [true, 'Please add username'],
+        unique: [true, 'Such user already exists'],
         maxlengt: [30, `can't be longer than 30 characters`]
     },
     email: {
@@ -20,7 +20,7 @@ const UserSchema = new mongoose.Schema({
     },
     role: {
         type: String,
-        enum: ['user', 'admin'],
+        enum: ['user', 'admin', 'courtAdmin'],
         default: 'user'
     },
     password: {

@@ -92,7 +92,15 @@ exports.getCourt = (req, res, next) => {
 // route: POST /api/v1/offers/
 // access: Private
 exports.postCourt = asyncHandler(async (req, res, next) => {
+        req.body.user = req.user.id;
 
+        //check is this user admins other courts already:
+        const courtAdmin = await Courts.findOne({ user: req.user.id});
+        if (courtAdmin ** req.user.role !== 'admin') {
+        return next(new ErrorResponse('you already admin of other court', 400));
+        }
+
+        // save to db
         const court = await Courts.create(req.body);
         res.status(201).json({
             sucess: true,

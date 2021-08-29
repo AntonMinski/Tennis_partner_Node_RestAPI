@@ -10,13 +10,13 @@ const { authenticated, hasPermission } = require('../middleware/auth');
 router
     .route('/')
     .get(getCourts)
-    .post(authenticated, hasPermission('user', 'admin'), postCourt);
+    .post(authenticated, hasPermission('courtAdmin', 'admin'), postCourt);
 
 router
     .route('/:id')
     .get(getCourt)
-    .put(authenticated, editCourt)
-    .delete(authenticated, hasPermission('user', 'admin'), deleteCourt);
+    .put(authenticated, hasPermission('courtAdmin', 'admin'), editCourt)
+    .delete(authenticated, hasPermission('courtAdmin', 'admin'), deleteCourt);
 
 
 
