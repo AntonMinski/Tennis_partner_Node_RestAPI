@@ -75,21 +75,16 @@ exports.getCourts = asyncHandler(async (req, res, next) => {
         });
 });
 
-// desc: get one offer
+// desc: get one court
 // route: GET /api/v1/courts/:id
 // access: Public
-exports.getCourt = (req, res, next) => {
-    Courts.findById(req.params.id)
-        .then(data =>
-            res.status(200).json({
-                success: true,
-                data: data
-            }))
-        .catch(err => next(err) );
-};
+exports.getCourt = asyncHandler (async (req, res, next) => {
+    const court = await Courts.findById(req.params.id);
+    res.status(200).json({success: true, court});
+});
 
 // desc: create court
-// route: POST /api/v1/offers/
+// route: POST /api/v1/courts/
 // access: Private
 exports.postCourt = asyncHandler(async (req, res, next) => {
         req.body.user = req.user.id;
@@ -108,31 +103,44 @@ exports.postCourt = asyncHandler(async (req, res, next) => {
         });
 });
 
-// desc: edit offer
-// route: PUT /api/v1/offers/:id
+// desc: edit court
+// route: PUT /api/v1/courts/:id
 // access: Private
-exports.editCourt = (req, res, next) => {
-    Courts.findByIdAndUpdate(req.params.id, req.body, {
+exports.editCourt = asyncHandler(async (req, res, next) => {
+    let court = await Courts.findById(req.params.id);
+
+    if (!court) {
+        return next(new ErrorResponse(
+            `Court with id <${req.params.id}> not exist`), 404);}
+
+    // check: user is court owner
+    console.log(court.user);
+    if (court.user.toString() !== req.user.id && req.user.role !== 'admin') {
+        next(new ErrorResponse('User is not court owner', 403));
+    }
+    // update court:
+    court = await Courts.findOneAndUpdate(req.params.id, req.body, {
         new: true,
         runValidators: true
-    })
-        .then(data =>
-            res.status(200).json({
-                success: true,
-                data: data
-            }))
-        .catch(err => next(err));
-};
+    });
+    res.status(200).json({success: true, court});
+});
 
-// desc: delete offer
-// route: DELETE /api/v1/offers/:id
+// desc: delete court
+// route: DELETE /api/v1/courts/:id
 // access: Private
-exports.deleteCourt = (req, res, next) => {
-    Courts.findByIdAndDelete(req.params.id)
-        .then(data =>
-            res.status(200).json({
-                success: true,
-                data: {}
-            }))
-        .catch(err => next(err));
-};
+exports.deleteCourt = asyncHandler (async (req, res, next) => {
+    const court = Courts.findById(req.params.id);
+
+    if (!court) {
+        return next(new ErrorResponse(
+            `Court with id <${req.params.id}> not exist`), 404);}
+
+    // check: user is court owner
+    if (court.user != req.user.id && req.user.role !== 'admin') {
+        next(new ErrorResponse('User is not court owner', 403));}
+
+    // Delete:
+    court.remove();
+    res.status(200).json({success: true, data: {} });
+});
