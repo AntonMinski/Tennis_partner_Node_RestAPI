@@ -39,18 +39,17 @@ exports.login = asyncHandler(async(req, res, next) => {
      if (!isMatch) {
          return  next(new ErrorResponse('Wrong password', 401));
      }
-
     // send token and cookie:
     sendTokenResponse(user, 200, res);
 });
 
+// desc: user info
+// route:
+// access: Public
 exports.getUser = asyncHandler(async(req, res, next) => {
     const user = await User.findById(req.user.id);
-
     res.status(200).json({sucess: true, data: user});
 });
-
-
 
 // Get token, send cookie:
 const sendTokenResponse = (user, statusCode, res) => {
@@ -59,18 +58,30 @@ const sendTokenResponse = (user, statusCode, res) => {
 
     const options = {
         expires: new Date(Date.now() + process.env.JWT_COOKIE_EXPIRE * 24
-        * 60 * 60 * 1000),
-        httpOnly: true,
-    };
+        * 60 * 60 * 1000),  httpOnly: true, };
 
     if (process.env.NODE_ENV === 'production') {
-        options.secure = true;
-    }
-
-    res
-        .status(statusCode)
-        .cookie('token', token, options)
+        options.secure = true;}
+    res.status(statusCode).cookie('token', token, options)
         .json({sucess: true, token});
-
 };
+
+// desc: forgot Password
+// route: POST /api/v1/auth/forgot_password
+// access: Public
+exports.forgotPassword = asyncHandler(async(req, res, next) => {
+    const user = await User.findOne({email: req.body.email});
+
+    if (!user) {
+        return next(new ErrorResponse(
+            'User with this email not exists', 404));}
+
+    // Create reset token
+    const resetToken = user.getResetPasswordToken();
+
+    await user.save({ validateBeforeSave: false });
+
+    res.status(200).json({sucess: true, data: user});
+});
+
 
