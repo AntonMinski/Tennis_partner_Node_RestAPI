@@ -1,0 +1,142 @@
+const ErrorResponse = require('../../diff/utils/errorResponse');
+const asyncHandler = require('../../middleware/async');
+const Message = require('./model');
+
+
+// desc: get all messages
+// route: GET /api/v1/messages
+// access: Public
+exports.getMessages = asyncHandler(async (req, res, next) => {
+    let query;
+
+    // copy req.query
+    const reqQuery = { ...req.query };
+
+    // Fields to exclude
+    const removeFields = ['select', 'sort', 'page', 'limit'];
+
+    // Loop over removeFields and delete them from reqQuery
+    removeFields.forEach(param => delete reqQuery[param]);
+
+    // Create query string
+    let queryStr = JSON.stringify(reqQuery);
+
+    // Create operators $gt/$lte/...
+    queryStr = queryStr.replace(/\b(gt|gte|lt|lte|in)\b/g,
+            match => `$${match}`);
+    // Find a resource
+    query = Message.find(JSON.parse(queryStr));
+
+    // Select fields:
+    if (req.query.select) {
+        const fields = req.query.select.split(',').join(' ');
+        query = query.select(fields);
+    }
+    // Sort
+    if (req.query.sort) {
+        const sortBy = req.query.sort.split(',').join(' ');
+        query = query.sort(sortBy);
+    } else {
+        query = query.sort('_id');
+    }
+    // Pagination
+    const page = parseInt(req.query.page, 10) || 1;
+    const limit = parseInt(req.query.limit, 10) || 20;
+    const startIndex = (page -1) * limit;
+    const endIndex = page * limit;
+    const total = await Message.countDocuments();
+
+    query = query.skip(startIndex).limit(limit);
+
+    // Execute query
+    const messages = await query;
+
+    // Pagination result
+    const pagination = {};
+
+    if (endIndex < total) {
+        pagination.next = {
+            page: page + 1,
+            limit
+        }
+    }
+    if (startIndex > 0) {
+        pagination.prev = {
+            page: page -1,
+            limit
+        }
+    }
+
+    res.status(200).json({
+            success: true,
+            length: messages.length,
+            pagination,
+            data: messages
+        });
+});
+
+// desc: get one message
+// route: GET /api/v1/message/:id
+// access: Public
+exports.getMessage = asyncHandler (async (req, res, next) => {
+    const message = await Message.findById(req.params.id);
+    res.status(200).json({success: true, message});
+});
+
+// desc: create message
+// route: POST /api/v1/messages/
+// access: Private
+exports.postMessage = asyncHandler(async (req, res, next) => {
+        req.body.sender = req.user.id;
+
+        const message = await Message.create(req.body);
+        res.status(201).json({
+            sucess: true,
+            data: message
+        });
+});
+
+// desc: edit message
+// route: PUT /api/v1/messages/:id
+// access: Private
+exports.editMessage = asyncHandler(async (req, res, next) => {
+    let message = await Message.findById(req.params.id);
+
+    if (!message) {
+        return next(new ErrorResponse(
+            `Message with id <${req.params.id}> not exist`), 404);}
+
+    // check: user is message sender
+    if (message.sender.toString() !== req.user.id && req.user.role !== 'admin') {
+        next(new ErrorResponse('User is not message sender', 403));
+    }
+    // update message:
+    message = await Message.findOneAndUpdate(req.params.id, req.body, {
+        new: true,
+        runValidators: true
+    });
+    res.status(200).json({success: true, message});
+});
+
+// desc: delete message
+// route: DELETE /api/v1/messages/:id
+// access: Private
+exports.deleteMessage = asyncHandler (async (req, res, next) => {
+    const message = await Message.findOne({id: req.params.id});
+
+
+    if (!message) {
+        return next(new ErrorResponse(
+            `Message with id <${req.params.id}> not exist`), 404);}
+
+    // const messageObject = message.toObject({ getters: true });
+    // console.log(messageObject);
+
+    // check: user is message sender
+    if (message.sender.toString() !== req.user.id && req.user.role !== 'admin') {
+        next(new ErrorResponse('User is not message owner', 403));}
+
+    // Delete:
+    message.remove();
+    res.status(200).json({success: true, data: {} });
+});

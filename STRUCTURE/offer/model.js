@@ -1,6 +1,12 @@
 const mongoose = require('mongoose');
 const OfferSchema = new mongoose.Schema({
 
+    place: {
+        type: String,
+        required: [true, 'Please add a place, where you want to play'],
+        trim: true,
+        maxlengt: [70, `can't be longer than 70 characters`]
+    },
     time_range: {
          type: String,
          required: [true, 'Please add a time, when you want to play'],
@@ -32,16 +38,3 @@ const OfferSchema = new mongoose.Schema({
 });
 
 module.exports = mongoose.model('Offers', OfferSchema);
-
-/*
-    author = models.ForeignKey(settings.AUTH_USER_MODEL,
-                               on_delete=models.CASCADE, related_name='author')
-    place = models.CharField(max_length=70)
-    time_range = models.CharField(max_length=50)
-    level = models.CharField(max_length=15)
-    game_type = models.CharField(max_length=20, blank=True)
-    details = models.TextField()
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
- */

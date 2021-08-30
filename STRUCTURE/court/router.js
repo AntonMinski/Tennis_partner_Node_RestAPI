@@ -1,11 +1,11 @@
 const express = require('express');
 const router = express.Router();
-const Courts =  require('../models/Courts');
+const Courts =  require('./model');
 
 const {getCourts, getCourt, postCourt, editCourt, deleteCourt}
-= require('../controllers/courts')
+= require('./controller')
 
-const { authenticated, hasPermission } = require('../middleware/auth');
+const { authenticated, hasPermission } = require('../../middleware/auth');
 
 router
     .route('/')

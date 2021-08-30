@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const slugify = require('slugify');
-const geocoder = require('../utils/geoCoder')
+const geocoder = require('../../diff/utils/geoCoder')
 
 
 const CourtSchema = new mongoose.Schema({

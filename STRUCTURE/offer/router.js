@@ -2,10 +2,10 @@ const express = require('express');
 const router = express.Router();
 
 const {getOffers, getOffer, postOffer, editOffer, deleteOffer}
-= require('../controllers/offers')
+= require('./controller')
 
 // Set authorization permissions:
-const { authenticated } = require('../middleware/auth');
+const { authenticated } = require('../../middleware/auth');
 
 //use:
 

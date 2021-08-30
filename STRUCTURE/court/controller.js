@@ -1,6 +1,6 @@
-const ErrorResponse = require('../utils/errorResponse');
-const asyncHandler = require('../middleware/async');
-const Courts = require('../models/Courts');
+const ErrorResponse = require('../../diff/utils/errorResponse');
+const asyncHandler = require('../../middleware/async');
+const Courts = require('./model');
 
 
 // desc: get all courts
@@ -108,6 +108,8 @@ exports.postCourt = asyncHandler(async (req, res, next) => {
 // access: Private
 exports.editCourt = asyncHandler(async (req, res, next) => {
     let court = await Courts.findById(req.params.id);
+    console.log('1:', req.user.id)
+    console.log('2:', court)
 
     if (!court) {
         return next(new ErrorResponse(

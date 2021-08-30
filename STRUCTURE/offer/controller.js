@@ -1,6 +1,6 @@
-const ErrorResponse = require('../utils/errorResponse');
-const asyncHandler = require('../middleware/async');
-const Offer = require('../models/Offers');
+const ErrorResponse = require('../../diff/utils/errorResponse');
+const asyncHandler = require('../../middleware/async');
+const Offer = require('./model');
 
 
 // desc: get all offers

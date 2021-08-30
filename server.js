@@ -6,7 +6,7 @@ const colors = require('colors');
 const cookieParser = require('cookie-parser');
 
 const errorHandler = require('./middleware/error');
-const connectDB = require('./models/db');
+const connectDB = require('./STRUCTURE/db');
 
 // Load env vars:
 environment.config({path: './config/config.env'});
@@ -15,9 +15,10 @@ environment.config({path: './config/config.env'});
 connectDB();
 
 // Route files
-const offers_router = require('./routes/offers');
-const courts_router = require('./routes/courts');
-const auth_router = require('./routes/auth');
+const offers_router = require('./STRUCTURE/offer/router');
+const courts_router = require('./STRUCTURE/court/router');
+const auth_router = require('./STRUCTURE/user/router');
+const message_router = require('./STRUCTURE/message/router');
 
 
 const app = express();
@@ -36,6 +37,7 @@ app.use(morgan('dev'));
 app.use('/api/v1/offers', offers_router);
 app.use('/api/v1/courts', courts_router);
 app.use('/api/v1/auth', auth_router);
+app.use('/api/v1/messages', message_router);
 
 app.use(errorHandler);
 
