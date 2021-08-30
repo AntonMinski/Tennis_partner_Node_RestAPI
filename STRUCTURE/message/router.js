@@ -4,7 +4,8 @@ const Message =  require('./model');
 
 const {getMessages, getMessage, postMessage, editMessage, deleteMessage,
 sentMessages, receivedMessages} = require('./controller')
-const { authenticated, hasPermission } = require('../../middleware/auth');
+const { authenticated, hasPermission, messageSender } =
+    require('../../middleware/auth');
 
 
 router
@@ -17,9 +18,9 @@ router.route('/received').get(authenticated, receivedMessages)
 
 router
     .route('/:id')
-    .get(authenticated, getMessage)
-    .put(authenticated, editMessage)
-    .delete(authenticated, deleteMessage);
+    .get(authenticated, messageSender, getMessage)
+    .put(authenticated, messageSender, editMessage)
+    .delete(authenticated, messageSender, deleteMessage);
 
 
 module.exports = router;

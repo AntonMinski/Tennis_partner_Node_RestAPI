@@ -116,10 +116,7 @@ exports.postMessage = asyncHandler(async (req, res, next) => {
         req.body.sender = req.user.id;
 
         const message = await Message.create(req.body);
-        res.status(201).json({
-            sucess: true,
-            data: message
-        });
+        res.status(201).json({sucess: true, data: message});
 });
 
 // desc: edit message
@@ -128,14 +125,6 @@ exports.postMessage = asyncHandler(async (req, res, next) => {
 exports.editMessage = asyncHandler(async (req, res, next) => {
     let message = await Message.findById(req.params.id);
 
-    if (!message) {
-        return next(new ErrorResponse(
-            `Message with id <${req.params.id}> not exist`), 404);}
-
-    // check: user is message sender
-    if (message.sender.toString() !== req.user.id && req.user.role !== 'admin') {
-        next(new ErrorResponse('User is not message sender', 403));
-    }
     // update message:
     message = await Message.findOneAndUpdate(req.params.id, req.body, {
         new: true,
@@ -149,18 +138,6 @@ exports.editMessage = asyncHandler(async (req, res, next) => {
 // access: Private
 exports.deleteMessage = asyncHandler (async (req, res, next) => {
     const message = await Message.findOne({id: req.params.id});
-
-
-    if (!message) {
-        return next(new ErrorResponse(
-            `Message with id <${req.params.id}> not exist`), 404);}
-
-    // const messageObject = message.toObject({ getters: true });
-    // console.log(messageObject);
-
-    // check: user is message sender
-    if (message.sender.toString() !== req.user.id && req.user.role !== 'admin') {
-        next(new ErrorResponse('User is not message owner', 403));}
 
     // Delete:
     message.remove();

@@ -3,6 +3,7 @@ const ErrorResponse = require('../diff/utils/errorResponse');
 const asyncHandler = require('./async');
 const User = require('../STRUCTURE/user/model');
 const userProfile = require('../STRUCTURE/userProfile/model');
+const Message = require('../STRUCTURE/message/model');
 
 // Protect routes:
 exports.authenticated = asyncHandler(async (req, res, next) => {
@@ -69,6 +70,22 @@ exports.alreadyHasProfile = asyncHandler(async (req, res, next) => {
     }
 
      // if no errors:
+    return next();
+});
+
+exports.messageSender = asyncHandler(async (req, res, next) => {
+    const message = await Message.findOne({_id: req.params.id});
+
+    if (!message) {
+        return next(new ErrorResponse(
+            `Message with id <${req.params.id}> not exist`), 404);
+    }
+
+    // check: user is message sender
+    if (message.sender.toString() !== req.user.id && req.user.role !== 'admin') {
+        next(new ErrorResponse('User is not message sender1', 403));}
+
+    // if no errors:
     return next();
 });
 
