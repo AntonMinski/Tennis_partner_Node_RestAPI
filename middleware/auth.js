@@ -1,8 +1,8 @@
 const jwt = require('jsonwebtoken');
-
 const ErrorResponse = require('../diff/utils/errorResponse');
 const asyncHandler = require('./async');
 const User = require('../STRUCTURE/user/model');
+const userProfile = require('../STRUCTURE/userProfile/model');
 
 // Protect routes:
 exports.authenticated = asyncHandler(async (req, res, next) => {
@@ -42,4 +42,33 @@ exports.hasPermission = (...roles) => {  // roles from array ..roles can do that
          }
          next();
     }
-}
+};
+
+exports.profileOwner = asyncHandler(async (req,res, next) => {
+    const profile = await userProfile.findOne({user: req.user.id});
+
+    // Profile not exists yet:
+    if (!profile) {
+        return next(new ErrorResponse('Profile not exists yet', 404));
+    }
+
+    // User is not profile owner:
+    if (profile.user.toString() !== req.user.id && req.user.role !== 'admin') {
+        return next(new ErrorResponse('User is not profile owner', 403));
+    }
+
+    // if no errors:
+    return next();
+});
+
+exports.alreadyHasProfile = asyncHandler(async (req, res, next) => {
+    const profile = await userProfile.findOne({user: req.user.id});
+
+    if (profile) {
+        return next(new ErrorResponse('You already profile owner', 404));
+    }
+
+     // if no errors:
+    return next();
+});
+

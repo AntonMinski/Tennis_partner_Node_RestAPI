@@ -5,7 +5,7 @@ const Profile = require('./model');
 
 // desc: get all profiles
 // route: GET /api/v1/profiles
-// access: User or owner
+// access: Private
 exports.getUserProfiles = asyncHandler(async (req, res, next) => {
 
 
@@ -79,54 +79,38 @@ exports.getUserProfiles = asyncHandler(async (req, res, next) => {
 });
 
 // desc: get own profile
-// route: GET /api/v1/profiles/:id
-// access: Owner or Admin
-exports.getUserProfile = asyncHandler (async (req, res, next) => {
-    const profile = await Profile.findById(req.params.id);
+// route: GET /api/v1/profiles
+// access: Private
+exports.getOwnProfile = asyncHandler (async (req, res, next) => {
+    const profile = await Profile.find({user: req.user.id});
 
-    if (!profile) {
-        return next(new ErrorResponse(
-            `Profile with id <${req.params.id}> not exist`), 404);}
-
-    // check: user is profile owner
-    if (profile.user.toString() !== req.user.id && req.user.role !== 'admin') {
-        next(new ErrorResponse('User is not profile owner', 403));
-    }
+    // if (!profile) {
+    //     return next(new ErrorResponse(
+    //         `Profile not exist yet`), 404);}
 
     res.status(200).json({success: true, message: profile});
 });
 
 // desc: create profile
 // route: POST /api/v1/profiles/
-// access: Public
+// access: Private
 exports.postUserProfile = asyncHandler(async (req, res, next) => {
         req.body.user = req.user.id;
-
-        //check is this user admins other courts already:
-        const proileOwner = await Profile.findOne({ user: req.user.id});
-        if (proileOwner && req.user.role !== 'admin') {
-        return next(new ErrorResponse('you already admin of other court', 400));
-        }
-
         const profile = await Profile.create(req.body);
         res.status(201).json({sucess: true, data: profile});
 });
 
 // desc: edit own profile
 // route: PUT /api/v1/profiles/:id
-// access: Admin or Owner
+// access: Private
 exports.editUserProfile = asyncHandler(async (req, res, next) => {
     let profile = await Profile.findById(req.params.id);
 
-    if (!profile) {
-        return next(new ErrorResponse(
-            `Profile with id <${req.params.id}> not exist`), 404);}
-
-    // check: user is message sender
-    if (profile.user.toString() !== req.user.id && req.user.role !== 'admin') {
-        next(new ErrorResponse('User is not profile owner', 403));
+    if (req.body.sport_styles) {
+        req.body.sport_styles =
+            Array.isArray(req.body.sport_styles) ? req.body.sport_styles : [req.body.sport_styles];
     }
-    // update message:
+
     profile = await Profile.findOneAndUpdate(req.params.id, req.body, {
         new: true,
         runValidators: true

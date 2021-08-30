@@ -2,21 +2,23 @@ const express = require('express');
 const router = express.Router();
 const UserProfile =  require('./model');
 
-const {getUserProfiles, getUserProfile, postUserProfile, editUserProfile,
+const {getUserProfiles, getOwnProfile, postUserProfile, editUserProfile,
     deleteUserProfile} = require('./controller')
-const { authenticated, hasPermission } = require('../../middleware/auth');
+const { authenticated, hasPermission, profileOwner, alreadyHasProfile} =
+    require('../../middleware/auth');
+
+
+router
+    .route('/all')
+    .get(authenticated, hasPermission('admin'), getUserProfiles);
 
 
 router
     .route('/')
-    .get(getUserProfiles, authenticated, hasPermission('admin'))
-    .post(authenticated, postUserProfile);
-
-router
-    .route('/:id')
-    .get(getUserProfile)
-    .put(authenticated, editUserProfile)
-    .delete(authenticated, deleteUserProfile);
+    .get(authenticated, profileOwner, getOwnProfile)
+    .post(authenticated, alreadyHasProfile, postUserProfile)
+    .put(authenticated, profileOwner, editUserProfile)
+    .delete(authenticated, profileOwner, deleteUserProfile);
 
 
 module.exports = router;

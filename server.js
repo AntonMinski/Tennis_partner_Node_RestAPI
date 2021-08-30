@@ -39,7 +39,7 @@ app.use('/api/v1/offers', offers_router);
 app.use('/api/v1/courts', courts_router);
 app.use('/api/v1/auth', auth_router);
 app.use('/api/v1/messages', message_router);
-app.use('/api/v1/profiles', profile_router);
+app.use('/api/v1/profile', profile_router);
 
 app.use(errorHandler);
 

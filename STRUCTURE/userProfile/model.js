@@ -30,7 +30,7 @@ const UserProfileSchema = new mongoose.Schema({
     },
 
     sport_styles: {
-        type: String,
+        type: [String],
         enum: ['Football', 'Tennis', 'Bike'],
     },
 });
