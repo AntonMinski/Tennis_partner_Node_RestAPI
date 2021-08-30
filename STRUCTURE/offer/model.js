@@ -33,7 +33,7 @@ const OfferSchema = new mongoose.Schema({
     user: {
         type: mongoose.Schema.ObjectId,
         ref: 'Users',
-        require: true,
+        required: true,
     },
 });
 

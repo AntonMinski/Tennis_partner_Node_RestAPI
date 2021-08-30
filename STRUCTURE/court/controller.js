@@ -91,7 +91,7 @@ exports.postCourt = asyncHandler(async (req, res, next) => {
 
         //check is this user admins other courts already:
         const courtAdmin = await Courts.findOne({ user: req.user.id});
-        if (courtAdmin ** req.user.role !== 'admin') {
+        if (courtAdmin && req.user.role !== 'admin') {
         return next(new ErrorResponse('you already admin of other court', 400));
         }
 

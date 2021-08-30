@@ -13,13 +13,13 @@ const MessageSchema = new mongoose.Schema({
     sender: {
         type: mongoose.Schema.ObjectId,
         ref: 'Users',
-        require: true,
+        required: true,
     },
 
     receiver: {
         type: mongoose.Schema.ObjectId,
         ref: 'Users',
-        require: true,
+        required: true,
     },
 });
 

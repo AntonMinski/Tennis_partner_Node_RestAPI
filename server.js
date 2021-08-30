@@ -19,6 +19,7 @@ const offers_router = require('./STRUCTURE/offer/router');
 const courts_router = require('./STRUCTURE/court/router');
 const auth_router = require('./STRUCTURE/user/router');
 const message_router = require('./STRUCTURE/message/router');
+const profile_router = require('./STRUCTURE/userProfile/router');
 
 
 const app = express();
@@ -38,6 +39,7 @@ app.use('/api/v1/offers', offers_router);
 app.use('/api/v1/courts', courts_router);
 app.use('/api/v1/auth', auth_router);
 app.use('/api/v1/messages', message_router);
+app.use('/api/v1/profiles', profile_router);
 
 app.use(errorHandler);
 
