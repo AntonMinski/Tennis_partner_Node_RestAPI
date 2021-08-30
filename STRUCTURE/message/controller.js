@@ -80,8 +80,34 @@ exports.getMessages = asyncHandler(async (req, res, next) => {
 // access: Public
 exports.getMessage = asyncHandler (async (req, res, next) => {
     const message = await Message.findById(req.params.id);
+
+    // user neither sender not receiver
+    if (message.sender.toString() !== req.user.id
+        && message.receiver.toString() !== req.user.id)
+    { return next(
+        new ErrorResponse('This message belongs to other users', 403));
+    }
+
     res.status(200).json({success: true, message});
 });
+
+// desc: get sent messages
+// route: POST /api/v1/messages/sent
+// access: Private
+exports.sentMessages = asyncHandler(async (req, res, next) => {
+        const messages = await Message.find({ sender: req.user.id });
+        res.status(201).json({sucess: true, messages});
+});
+
+
+// desc: get received messages
+// route: POST /api/v1/messages/received
+// access: Private
+exports.receivedMessages = asyncHandler(async (req, res, next) => {
+        const messages = await Message.find({ receiver: req.user.id });
+        res.status(201).json({sucess: true, messages});
+});
+
 
 // desc: create message
 // route: POST /api/v1/messages/
