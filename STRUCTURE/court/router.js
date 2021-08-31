@@ -5,7 +5,8 @@ const Courts =  require('./model');
 const {getCourts, getCourt, postCourt, editCourt, deleteCourt}
 = require('./controller')
 
-const { authenticated, hasPermission } = require('../../middleware/auth');
+const { authenticated, hasPermission, courtAdmin, CourtAdmin2} =
+    require('../../middleware/auth');
 
 router
     .route('/')
@@ -15,8 +16,8 @@ router
 router
     .route('/:id')
     .get(getCourt)
-    .put(authenticated, hasPermission('courtAdmin', 'admin'), editCourt)
-    .delete(authenticated, hasPermission('courtAdmin', 'admin'), deleteCourt);
+    .put(authenticated, CourtAdmin2, editCourt)
+    .delete(authenticated, courtAdmin, deleteCourt);
 
 
 

@@ -85,7 +85,7 @@ exports.getCourt = asyncHandler (async (req, res, next) => {
 
 // desc: create court
 // route: POST /api/v1/courts/
-// access: Private
+// access: Private (this time made here, other modules in middleware)
 exports.postCourt = asyncHandler(async (req, res, next) => {
         req.body.user = req.user.id;
 
@@ -107,17 +107,7 @@ exports.postCourt = asyncHandler(async (req, res, next) => {
 // route: PUT /api/v1/courts/:id
 // access: Private
 exports.editCourt = asyncHandler(async (req, res, next) => {
-    let court = await Courts.findById(req.params.id);
 
-    if (!court) {
-        return next(new ErrorResponse(
-            `Court with id <${req.params.id}> not exist`), 404);}
-
-    // check: user is court owner
-    console.log(court.user);
-    if (court.user.toString() !== req.user.id && req.user.role !== 'admin') {
-        next(new ErrorResponse('User is not court owner', 403));
-    }
     // update court:
     court = await Courts.findOneAndUpdate(req.params.id, req.body, {
         new: true,
@@ -130,15 +120,6 @@ exports.editCourt = asyncHandler(async (req, res, next) => {
 // route: DELETE /api/v1/courts/:id
 // access: Private
 exports.deleteCourt = asyncHandler (async (req, res, next) => {
-    const court = Courts.findById(req.params.id);
-
-    if (!court) {
-        return next(new ErrorResponse(
-            `Court with id <${req.params.id}> not exist`), 404);}
-
-    // check: user is court owner
-    if (court.user != req.user.id && req.user.role !== 'admin') {
-        next(new ErrorResponse('User is not court owner', 403));}
 
     // Delete:
     court.remove();

@@ -95,8 +95,8 @@ exports.getMessage = asyncHandler (async (req, res, next) => {
 // route: POST /api/v1/messages/sent
 // access: Private
 exports.sentMessages = asyncHandler(async (req, res, next) => {
-        const messages = await Message.find({ sender: req.user.id });
-        res.status(201).json({sucess: true, messages});
+    const messages = await Message.find({sender: req.user.id});
+    res.status(201).json({sucess: true, messages});
 });
 
 
@@ -116,6 +116,7 @@ exports.postMessage = asyncHandler(async (req, res, next) => {
         req.body.sender = req.user.id;
 
         const message = await Message.create(req.body);
+
         res.status(201).json({sucess: true, data: message});
 });
 
@@ -123,7 +124,6 @@ exports.postMessage = asyncHandler(async (req, res, next) => {
 // route: PUT /api/v1/messages/:id
 // access: Private
 exports.editMessage = asyncHandler(async (req, res, next) => {
-    let message = await Message.findById(req.params.id);
 
     // update message:
     message = await Message.findOneAndUpdate(req.params.id, req.body, {
@@ -137,9 +137,6 @@ exports.editMessage = asyncHandler(async (req, res, next) => {
 // route: DELETE /api/v1/messages/:id
 // access: Private
 exports.deleteMessage = asyncHandler (async (req, res, next) => {
-    const message = await Message.findOne({id: req.params.id});
-
-    // Delete:
-    message.remove();
+    const message = await Message.findByIdAndRemove(req.params.id);
     res.status(200).json({success: true, data: {} });
 });

@@ -3,9 +3,9 @@ const asyncHandler = require('../../middleware/async');
 const Profile = require('./model');
 
 
-// desc: get all profiles
+// desc: get all profiles for admin only)
 // route: GET /api/v1/profiles
-// access: Private
+// access: Private (by middleware role permissions)
 exports.getUserProfiles = asyncHandler(async (req, res, next) => {
 
 
@@ -80,20 +80,15 @@ exports.getUserProfiles = asyncHandler(async (req, res, next) => {
 
 // desc: get own profile
 // route: GET /api/v1/profiles
-// access: Private
+// access: Private (made by middleware)
 exports.getOwnProfile = asyncHandler (async (req, res, next) => {
     const profile = await Profile.find({user: req.user.id});
-
-    // if (!profile) {
-    //     return next(new ErrorResponse(
-    //         `Profile not exist yet`), 404);}
-
     res.status(200).json({success: true, message: profile});
 });
 
 // desc: create profile
 // route: POST /api/v1/profiles/
-// access: Private
+// access: Private (made by middleware)
 exports.postUserProfile = asyncHandler(async (req, res, next) => {
         req.body.user = req.user.id;
         const profile = await Profile.create(req.body);
@@ -102,15 +97,8 @@ exports.postUserProfile = asyncHandler(async (req, res, next) => {
 
 // desc: edit own profile
 // route: PUT /api/v1/profiles/:id
-// access: Private
+// access: Private(made by middleware)
 exports.editUserProfile = asyncHandler(async (req, res, next) => {
-    let profile = await Profile.findById(req.params.id);
-
-    if (req.body.sport_styles) {
-        req.body.sport_styles =
-            Array.isArray(req.body.sport_styles) ? req.body.sport_styles : [req.body.sport_styles];
-    }
-
     profile = await Profile.findOneAndUpdate(req.params.id, req.body, {
         new: true,
         runValidators: true
@@ -120,20 +108,8 @@ exports.editUserProfile = asyncHandler(async (req, res, next) => {
 
 // desc: delete profile
 // route: DELETE /api/v1/profiles/:id
-// access: Private
+// access: Private (made by middleware)
 exports.deleteUserProfile = asyncHandler (async (req, res, next) => {
-    const profile = await Profile.findOne({id: req.params.id});
-
-
-    if (!profile) {
-        return next(new ErrorResponse(
-            `Profile with id <${req.params.id}> not exist`), 404);}
-
-    // check: user is profile owner
-    if (profile.user.toString() !== req.user.id && req.user.role !== 'admin') {
-        next(new ErrorResponse('User is not profile owner', 403));}
-
-    // Delete:
-    profile.remove();
+    const profile = await Profile.findByIdAndRemove(req.params.id);
     res.status(200).json({success: true, data: {} });
 });
