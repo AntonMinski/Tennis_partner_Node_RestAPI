@@ -5,7 +5,7 @@ const User = require('../STRUCTURE/user/model');
 const userProfile = require('../STRUCTURE/userProfile/model');
 const Message = require('../STRUCTURE/message/model');
 const Courts = require('../STRUCTURE/court/model');
-const Offer = require('../STRUCTURE/offer/model');
+const Offers = require('../STRUCTURE/offer/model');
 
 // Protect routes:
 exports.authenticated = asyncHandler(async (req, res, next) => {
@@ -35,31 +35,25 @@ exports.authenticated = asyncHandler(async (req, res, next) => {
 
     }
 });
-let model;
-let modelName;
 
-let baseOwner = asyncHandler(async (req, res, next) => {
-    let object = await model.findById(req.params.id);
 
-    if (!object) {
-        return next(new ErrorResponse(
-            `${modelName} with id <${req.params.id}> not exist`), 404);}
+// // MESSAGE MODEL
+// let model = Message;
+// let modelName = 'Message';
+// exports.messageSender = objectOwner;
+//
+//
+// // OFFER MODEL
+// model = Offers;
+// modelName = 'Offer';
+// exports.offerOwner = objectOwner;
+//
+//
+// // COURTS MODEL:
+// model = Courts;
+// modelName = 'Court';
+// exports.courtAdmin = objectOwner;
 
-    // check: user is court owner
-    if (object.user.toString() !== req.user.id && req.user.role !== 'admin') {
-        return next(new ErrorResponse(`User is not ${modelName} owner`, 403));
-    }
-
-    // if no errors:
-    return next();
-});
-
-// COURTS MODEL:
-model = Courts;
-modelName = 'Court'
-exports.CourtAdmin2 = baseOwner;
-
-// MESSAGE MODEL
 
 // Give access to specific roles:
 exports.hasPermission = (...roles) => {  // roles from array ..roles can do that action
@@ -100,54 +94,38 @@ exports.alreadyHasProfile = asyncHandler(async (req, res, next) => {
     return next();
 });
 
-exports.messageSender = asyncHandler(async (req, res, next) => {
-    const message = await Message.findOne({_id: req.params.id});
+// exports.messageSender = asyncHandler(async (req, res, next) => {
+//     const message = await Message.findOne({_id: req.params.id});
+//
+//     if (!message) {
+//         return next(new ErrorResponse(
+//             `Message with id <${req.params.id}> not exist`), 404);
+//     }
+//
+//     // check: user is message sender
+//     if (message.sender.toString() !== req.user.id && req.user.role !== 'admin') {
+//         return next(new ErrorResponse('User is not message sender1', 403));}
+//
+//     // if no errors:
+//     return next();
+// });
 
-    if (!message) {
-        return next(new ErrorResponse(
-            `Message with id <${req.params.id}> not exist`), 404);
-    }
+// exports.courtAdmin = asyncHandler(async (req, res, next) => {
+//     const court = await Courts.findById(req);
+//
+//     if (!court) {
+//         return next(new ErrorResponse(
+//             `Court with id <${req.params.id}> not exist`), 404);}
+//
+//     // check: user is court owner
+//     if (court.user.toString() !== req.user.id && req.user.role !== 'admin') {
+//         return next(new ErrorResponse('User is not court owner', 403));
+//     }
+//
+//     // if no errors:
+//     return next();
+// });
 
-    // check: user is message sender
-    if (message.sender.toString() !== req.user.id && req.user.role !== 'admin') {
-        return next(new ErrorResponse('User is not message sender1', 403));}
-
-    // if no errors:
-    return next();
-});
-
-exports.courtAdmin = asyncHandler(async (req, res, next) => {
-    const court = await Courts.findById(req);
-
-    if (!court) {
-        return next(new ErrorResponse(
-            `Court with id <${req.params.id}> not exist`), 404);}
-
-    // check: user is court owner
-    if (court.user.toString() !== req.user.id && req.user.role !== 'admin') {
-        return next(new ErrorResponse('User is not court owner', 403));
-    }
-
-    // if no errors:
-    return next();
-});
-
-court2Admin = (model, req, res, next) => {
-    const object = model.findById(req.params.id);
-
-    if (!object) {return next(new ErrorResponse(
-        `${model} with id <${req.params.id}> not exist`), 404);}
-
-    // check: user is object owner
-    if (object.user.toString() !== req.user.id && req.user.role !== 'admin') {
-        return next(new ErrorResponse(`User is not ${object} owner`, 403));
-    }
-
-    // if no errors:
-    return next();
-};
-
-// exports.court2Admin = baseOwner(Courts);
 
 
 

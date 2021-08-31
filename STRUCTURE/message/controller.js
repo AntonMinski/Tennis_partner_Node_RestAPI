@@ -5,7 +5,7 @@ const Message = require('./model');
 
 // desc: get all messages
 // route: GET /api/v1/messages
-// access: Public
+// access: Public (test, later would be admin only)
 exports.getMessages = asyncHandler(async (req, res, next) => {
     let query;
 
@@ -77,12 +77,12 @@ exports.getMessages = asyncHandler(async (req, res, next) => {
 
 // desc: get one message
 // route: GET /api/v1/message/:id
-// access: Public
+// access: Sender or Receiver
 exports.getMessage = asyncHandler (async (req, res, next) => {
     const message = await Message.findById(req.params.id);
 
-    // user neither sender not receiver
-    if (message.sender.toString() !== req.user.id
+    // user neither.user not receiver
+    if (message.user.toString() !== req.user.id
         && message.receiver.toString() !== req.user.id)
     { return next(
         new ErrorResponse('This message belongs to other users', 403));
@@ -93,16 +93,16 @@ exports.getMessage = asyncHandler (async (req, res, next) => {
 
 // desc: get sent messages
 // route: POST /api/v1/messages/sent
-// access: Private
+// access: Private, Sender only
 exports.sentMessages = asyncHandler(async (req, res, next) => {
-    const messages = await Message.find({sender: req.user.id});
+    const messages = await Message.find({user: req.user.id});
     res.status(201).json({sucess: true, messages});
 });
 
 
 // desc: get received messages
 // route: POST /api/v1/messages/received
-// access: Private
+// access: Private, Receiver only
 exports.receivedMessages = asyncHandler(async (req, res, next) => {
         const messages = await Message.find({ receiver: req.user.id });
         res.status(201).json({sucess: true, messages});
@@ -111,9 +111,9 @@ exports.receivedMessages = asyncHandler(async (req, res, next) => {
 
 // desc: create message
 // route: POST /api/v1/messages/
-// access: Private
+// access: Authenticated users
 exports.postMessage = asyncHandler(async (req, res, next) => {
-        req.body.sender = req.user.id;
+        req.body.user = req.user.id;
 
         const message = await Message.create(req.body);
 
@@ -122,7 +122,7 @@ exports.postMessage = asyncHandler(async (req, res, next) => {
 
 // desc: edit message
 // route: PUT /api/v1/messages/:id
-// access: Private
+// access: Private, Sender/admin only
 exports.editMessage = asyncHandler(async (req, res, next) => {
 
     // update message:
@@ -135,7 +135,7 @@ exports.editMessage = asyncHandler(async (req, res, next) => {
 
 // desc: delete message
 // route: DELETE /api/v1/messages/:id
-// access: Private
+// access: Private, Sender/admin only
 exports.deleteMessage = asyncHandler (async (req, res, next) => {
     const message = await Message.findByIdAndRemove(req.params.id);
     res.status(200).json({success: true, data: {} });

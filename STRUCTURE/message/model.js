@@ -10,7 +10,7 @@ const MessageSchema = new mongoose.Schema({
         maxlengt: [400, `Message can't be longer than 400 characters`]
     },
 
-    sender: {
+    user: {
         type: mongoose.Schema.ObjectId,
         ref: 'Users',
         required: true,

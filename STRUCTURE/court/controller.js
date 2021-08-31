@@ -1,6 +1,7 @@
 const ErrorResponse = require('../../diff/utils/errorResponse');
 const asyncHandler = require('../../middleware/async');
 const Courts = require('./model');
+const bodyParser = require('body-parser');
 
 
 // desc: get all courts
@@ -87,6 +88,7 @@ exports.getCourt = asyncHandler (async (req, res, next) => {
 // route: POST /api/v1/courts/
 // access: Private (this time made here, other modules in middleware)
 exports.postCourt = asyncHandler(async (req, res, next) => {
+        console.log(req.user.id);
         req.body.user = req.user.id;
 
         //check is this user admins other courts already:
@@ -107,8 +109,6 @@ exports.postCourt = asyncHandler(async (req, res, next) => {
 // route: PUT /api/v1/courts/:id
 // access: Private
 exports.editCourt = asyncHandler(async (req, res, next) => {
-
-    // update court:
     court = await Courts.findOneAndUpdate(req.params.id, req.body, {
         new: true,
         runValidators: true
@@ -120,8 +120,6 @@ exports.editCourt = asyncHandler(async (req, res, next) => {
 // route: DELETE /api/v1/courts/:id
 // access: Private
 exports.deleteCourt = asyncHandler (async (req, res, next) => {
-
-    // Delete:
-    court.remove();
+    const court = await Courts.findByIdAndRemove(req.params.id);
     res.status(200).json({success: true, data: {} });
 });
