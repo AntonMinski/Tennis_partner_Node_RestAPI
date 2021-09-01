@@ -1,5 +1,4 @@
 const express = require('express');
-const router = express.Router();
 
 // Set permissions:
 const {authenticated, hasPermission} = require('../../middleware/auth');
@@ -10,7 +9,9 @@ const {getObjects, getObject, postObject, editObject, deleteObject} =
         require('./base_controller');
 
 // create router:
-module.exports = (model) => {
+module.exports = function(model) {
+
+    const router = express.Router();
 
     router
         .route('/')

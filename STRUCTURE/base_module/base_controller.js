@@ -7,7 +7,7 @@ const bodyParser = require('body-parser');
 // route: GET /api/v1/objects
 // access: Public
 exports.getObjects = function(model) {
-    console.log(model.collectionName);
+    // console.log(model.collectionName);
     return asyncHandler(async (req, res, next) => {
     let query;
 

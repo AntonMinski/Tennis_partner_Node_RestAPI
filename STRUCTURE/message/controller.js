@@ -7,6 +7,7 @@ const Message = require('./model');
 // access: Sender or Receiver
 exports.getMessage = asyncHandler (async (req, res, next) => {
     const message = await Message.findById(req.params.id);
+    // console.log('entity method');
 
     // user neither.user not receiver
     if (message.user.toString() !== req.user.id
