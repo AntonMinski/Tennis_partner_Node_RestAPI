@@ -1,13 +1,14 @@
 const ErrorResponse = require('../../diff/utils/errorResponse');
 const asyncHandler = require('../../middleware/async');
-const Courts = require('./model');
 const bodyParser = require('body-parser');
 
 
-// desc: get all courts
-// route: GET /api/v1/courts
+// desc: get all objects
+// route: GET /api/v1/objects
 // access: Public
-exports.getCourts = asyncHandler(async (req, res, next) => {
+exports.getObjects = function(model) {
+    console.log(model.collectionName);
+    return asyncHandler(async (req, res, next) => {
     let query;
 
     // copy req.query
@@ -26,7 +27,7 @@ exports.getCourts = asyncHandler(async (req, res, next) => {
     queryStr = queryStr.replace(/\b(gt|gte|lt|lte|in)\b/g,
             match => `$${match}`);
     // Find a resource
-    query = Courts.find(JSON.parse(queryStr));
+    query = model.find(JSON.parse(queryStr));
 
     // Select fields:
     if (req.query.select) {
@@ -45,12 +46,12 @@ exports.getCourts = asyncHandler(async (req, res, next) => {
     const limit = parseInt(req.query.limit, 10) || 20;
     const startIndex = (page -1) * limit;
     const endIndex = page * limit;
-    const total = await Courts.countDocuments();
+    const total = await model.countDocuments();
 
     query = query.skip(startIndex).limit(limit);
 
     // Execute query
-    const courts = await query;
+    const objects = await query;
 
     // Pagination result
     const pagination = {};
@@ -70,46 +71,55 @@ exports.getCourts = asyncHandler(async (req, res, next) => {
 
     res.status(200).json({
             success: true,
-            length: courts.length,
+            length: objects.length,
             pagination,
-            data: courts
+            data: objects
         });
 });
+};
 
-// desc: get one court
-// route: GET /api/v1/courts/:id
+
+// desc: get one object
+// route: GET /api/v1/objects/:id
 // access: Public
-exports.getCourt = asyncHandler (async (req, res, next) => {
-    const court = await Courts.findById(req.params.id);
-    res.status(200).json({success: true, court});
-});
+exports.getObject = function(model) {
+    return asyncHandler(async (req, res, next) => {
+        const object = await model.findById(req.params.id);
+        res.status(200).json({success: true, object});
+    });
+};
 
-// desc: create court
-// route: POST /api/v1/courts/
-// access: Private (this time made here, other modules in middleware)
-exports.postCourt = asyncHandler(async (req, res, next) => {
+// desc: create object
+// route: POST /api/v1/objects/
+// access: Private
+exports.postObject = function(model) {
+    return asyncHandler(async (req, res, next) => {
         req.body.user = req.user.id;
 
         // save to db
-        const court = await Courts.create(req.body);
-        res.status(201).json({sucess: true, data: court});
-});
-
-// desc: edit court
-// route: PUT /api/v1/courts/:id
-// access: Private
-exports.editCourt = asyncHandler(async (req, res, next) => {
-    court = await Courts.findOneAndUpdate(req.params.id, req.body, {
-        new: true,
-        runValidators: true
+        const object = await model.create(req.body);
+        res.status(201).json({sucess: true, data: object});
     });
-    res.status(200).json({success: true, court});
-});
-
-// desc: delete court
-// route: DELETE /api/v1/courts/:id
+};
+// desc: edit object
+// route: PUT /api/v1/objects/:id
 // access: Private
-exports.deleteCourt = asyncHandler (async (req, res, next) => {
-    const court = await Courts.findByIdAndRemove(req.params.id);
-    res.status(200).json({success: true, data: {} });
-});
+exports.editObject = function(model) {
+    return asyncHandler(async (req, res, next) => {
+        object = await model.findOneAndUpdate(req.params.id, req.body, {
+            new: true,
+            runValidators: true
+        });
+        res.status(200).json({success: true, object});
+    });
+};
+
+// desc: delete object
+// route: DELETE /api/v1/objects/:id
+// access: Private
+exports.deleteObject = function(model) {
+    return asyncHandler(async (req, res, next) => {
+        const object = await model.findByIdAndRemove(req.params.id);
+        res.status(200).json({success: true, data: {}});
+    });
+};

@@ -14,7 +14,7 @@ environment.config({path: './config/config.env'});
 // connect to Database:
 connectDB();
 
-// Route files
+// Route files:
 const offers_router = require('./STRUCTURE/offer/router');
 const courts_router = require('./STRUCTURE/court/router');
 const auth_router = require('./STRUCTURE/user/router');

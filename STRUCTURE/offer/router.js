@@ -1,27 +1,26 @@
 const express = require('express');
 const router = express.Router();
 const model = require('./model');
-const modelName = 'Offer';
 
-const {getOffers, getOffer, postOffer, editOffer, deleteOffer}
-= require('./controller')
+const { authenticated, hasPermission } = require('../../middleware/auth');
 
-// Set authorization permissions:
-const { authenticated } = require('../../middleware/auth');
 // Set permissions:
-const { objectOwner } = require('../../middleware/modelAuth');
+const { objectOwner, alreadyOwner } = require('../../middleware/modelAuth');
 
-//use:
+const { getObjects, getObject, postObject, editObject, deleteObject } =
+    require('../base_module/base_controller');
+
 router
     .route('/')
-    .get(authenticated, getOffers)
-    .post(authenticated, postOffer);
+    .get(getObjects(model))
+    .post(authenticated, hasPermission('courtAdmin', 'admin'),
+        alreadyOwner(model), postObject(model));
 
 router
     .route('/:id')
-    .get(getOffer)
-    .put(authenticated, objectOwner(model, modelName), editOffer)
-    .delete(authenticated, objectOwner(model, modelName), deleteOffer);
+    .get(getObject(model))
+    .put(authenticated, objectOwner(model), editObject(model))
+    .delete(authenticated, objectOwner(model), deleteObject(model));
 
 
 module.exports = router;

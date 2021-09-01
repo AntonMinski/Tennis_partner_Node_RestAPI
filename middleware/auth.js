@@ -27,12 +27,11 @@ exports.authenticated = asyncHandler(async (req, res, next) => {
     try {
         // verify token:
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
         req.user = await User.findById(decoded.id);
 
-        next();
+        return next();
     } catch (err) {
-
+        console.log(err);
     }
 });
 
