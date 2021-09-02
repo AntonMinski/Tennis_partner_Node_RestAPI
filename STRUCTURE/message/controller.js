@@ -19,6 +19,7 @@ exports.getMessage = asyncHandler (async (req, res, next) => {
     res.status(200).json({success: true, message});
 });
 
+
 // desc: get sent messages
 // route: POST /api/v1/messages/sent
 // access: Private, Sender only

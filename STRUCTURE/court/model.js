@@ -24,6 +24,7 @@ const CourtSchema = new mongoose.Schema({
       reqired: [true, 'Please add an address']
     },
 
+    // location still in process
     location: {
         type: {
             type: String,
@@ -49,12 +50,11 @@ const CourtSchema = new mongoose.Schema({
         min: [5, `Rating cant be more than 5`]
     },
 
-    averageRating: Number,
+    averageRating: Number, // not implemented yet
 
     cover: {
         type: String,
         required: [true, `Please specify your cover`],
-        maxlenght: [30, `This field can't ne longer than 30 characters`],
         enum: ['grass', 'clay', 'hard']
     },
 
@@ -81,7 +81,7 @@ CourtSchema.pre('save', function (next) {
     next();
 });
 
-// Geocode & location field creation
+// Geocode & location field creation (packet not working with Ukrai
 // CourtSchema.pre('save', async function (next) {
 //     const lct = await geocoder.geocode(this.address);
 //     this.location = {

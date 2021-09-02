@@ -4,10 +4,9 @@ const bodyParser = require('body-parser');
 
 
 // desc: get all objects
-// route: GET /api/v1/objects
+// route: GET /api/v1/objects?query
 // access: Public
 exports.getObjects = function(model) {
-    // console.log(model.collectionName);
     return asyncHandler(async (req, res, next) => {
     let query;
 
@@ -26,7 +25,8 @@ exports.getObjects = function(model) {
     // Create operators $gt/$lte/...
     queryStr = queryStr.replace(/\b(gt|gte|lt|lte|in)\b/g,
             match => `$${match}`);
-    // Find a resource
+
+    // FIND AN OBJECT:
     query = model.find(JSON.parse(queryStr));
 
     // Select fields:
@@ -50,10 +50,10 @@ exports.getObjects = function(model) {
 
     query = query.skip(startIndex).limit(limit);
 
-    // Execute query
+    // GET OBJECT
     const objects = await query;
 
-    // Pagination result
+    // Pagination
     const pagination = {};
 
     if (endIndex < total) {
@@ -69,6 +69,7 @@ exports.getObjects = function(model) {
         }
     }
 
+    // response
     res.status(200).json({
             success: true,
             length: objects.length,

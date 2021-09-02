@@ -21,13 +21,11 @@ const OfferSchema = new mongoose.Schema({
      },
     game_type: {
          type: String,
-         required: false,
          trim: true,
          maxlengt: [50, `can't be longer than 50 characters`]
      },
     details: {
          type: String,
-         required: false,
          trim: true,
      },
     user: {

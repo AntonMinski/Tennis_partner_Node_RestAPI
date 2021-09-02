@@ -1,10 +1,10 @@
 const express = require('express');
 
-// Set permissions:
-const {authenticated, hasPermission} = require('../../middleware/auth');
-const {objectOwner, alreadyOwner} = require('../../middleware/modelAuth');
-// get controller:
+// authentication, role:
+const {authenticated, rolePermission} = require('../../middleware/auth');
+const {objectOwner, alreadyOwner} = require('../../middleware/permissions');
 
+// get controllers:
 const {getObjects, getObject, postObject, editObject, deleteObject} =
         require('./base_controller');
 
@@ -16,7 +16,7 @@ module.exports = function(model) {
     router
         .route('/')
         .get(getObjects(model))
-        .post(authenticated, hasPermission('courtAdmin', 'admin'),
+        .post(authenticated, rolePermission('courtAdmin', 'admin'),
             alreadyOwner(model), postObject(model));
 
     router
