@@ -172,3 +172,17 @@ exports.updatePassword = asyncHandler(async (req, res, next) => {
     sendTokenResponse(user, 200, res);
 });
 
+// desc: logout user, clear cookies
+// route: GET /api/v1/auth/logout
+// access: Private
+exports.logout = asyncHandler(async (req, res, next) => {
+
+    // clear cookies in 10 seconds:
+    res.cookie('token', 'none', {
+        expires: new Date(Date.now() + 10 * 1000),
+        httpOnly: true
+    });
+
+    res.status(200).json({success:true})
+
+});

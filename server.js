@@ -1,9 +1,16 @@
 const http = require('http');
 const express = require('express');
-const environment = require('dotenv');
-const morgan = require('morgan');
-const colors = require('colors');
-const cookieParser = require('cookie-parser');
+const environment = require('dotenv'); // variables from config file
+const morgan = require('morgan');  // HTTP request logger
+const colors = require('colors'); // colors in console
+const cookieParser = require('cookie-parser'); // Parse Cookie header and populate req.cookies
+// security:
+const mongoSanitize = require('express-mongo-sanitize'); // sql injections prevention
+const helmet = require('helmet'); // vss protection and security headers
+const xss = require('xss-clean'); //  html script atacks prevention
+const rateLimit = require("express-rate-limit"); // ddos attack prevention
+const hpp = require('hpp'); // HTTP Parameter Pollution attacks prevention
+const cors = require('cors');
 
 const errorHandler = require('./middleware/error');
 const connectDB = require('./STRUCTURE/db');
@@ -33,6 +40,35 @@ app.use(cookieParser());
 // middleware:
 // logging request detail:
 app.use(morgan('dev'));
+
+// Sanitize data (prevent sql injections)
+app.use(
+  mongoSanitize({
+    onSanitize: ({ req, key }) => {
+      console.warn(`This request[${key}] is sanitized`, req);
+    },
+  }),
+);
+
+// Set security headers:
+app.use(helmet());
+
+// Prevent cross site scripting (XSS attacks):
+app.use(xss());
+
+// Rate limiting:
+const limiter = rateLimit({
+  windowMs: 10 * 60 * 1000, // 10 minutes
+  max: 100 // limit each IP to 100 requests per windowMs
+});
+//  apply to all requests
+app.use(limiter);
+
+// Prevent http param pollution:
+app.use(hpp());
+
+// allow cors options:
+app.use(cors());
 
 //mount routers:
 app.use('/api/v1/offers', offers_router);

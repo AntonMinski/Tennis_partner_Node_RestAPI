@@ -11,11 +11,13 @@ const Offers = require('../STRUCTURE/offer/model');
 exports.authenticated = asyncHandler(async (req, res, next) => {
     let token;
 
+    // token from Bearer token in header
     if (req.headers.authorization &&
         req.headers.authorization.startsWith('Bearer')) {
         token = req.headers.authorization.split(' ')[1];
     }
 
+    // token from cookies:
     // else if (req.cookies.token) {
     //     token = req.cookies.token
     // }
